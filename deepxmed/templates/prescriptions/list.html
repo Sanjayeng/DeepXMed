@@ -1,0 +1,107 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>My Prescriptions – DeepXMed</title>
+    <style>
+        body {
+            font-family: system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+        }
+        table {
+            border-collapse: collapse;
+            width: 100%;
+            margin-top: 0.75rem;
+        }
+        th, td {
+            border: 1px solid #ddd;
+            padding: 6px 8px;
+            font-size: 14px;
+        }
+        th {
+            background: #f3f4f6;
+            text-align: left;
+        }
+        .raw-line {
+            color: #777;
+            font-size: 13px;
+        }
+        .prescription-block {
+            margin-bottom: 2.5rem;
+            padding-bottom: 1rem;
+            border-bottom: 1px solid #e5e7eb;
+        }
+        pre {
+            white-space: pre-wrap;
+            font-family: inherit;
+            background: #f9fafb;
+            padding: 0.6rem;
+            border-radius: 4px;
+            border: 1px solid #e5e7eb;
+            font-size: 13px;
+        }
+    </style>
+</head>
+<body>
+    <h2>My Prescriptions</h2>
+
+    {% if prescriptions %}
+        {% for p in prescriptions %}
+            <div class="prescription-block">
+                <strong>{{ p.uploaded_at }}</strong><br>
+                <img src="{{ p.image.url }}" alt="Prescription" width="250"><br><br>
+
+                <strong>OCR text:</strong><br>
+                <pre>
+{{ p.ocr_text|default:"(no OCR output yet)" }}
+                </pre>
+
+                {% with meds=p.medicines.all %}
+                    {% if meds %}
+                        <h4>Detected Medicines</h4>
+                        <table>
+                            <tr>
+                                <th>Form</th>
+                                <th>Name</th>
+                                <th>Strength</th>
+                                <th>Frequency</th>
+                                <th>Raw line</th>
+                            </tr>
+                            {% for m in meds %}
+                                <tr>
+                                    <td>{{ m.form }}</td>
+                                    <td>{{ m.name }}</td>
+                                    <td>{{ m.strength }}</td>
+                                    <td>{{ m.frequency }}</td>
+                                    <td class="raw-line">{{ m.raw_line }}</td>
+                                </tr>
+                            {% for m in p.medicines.all %}
+                            <tr>
+                               <td>{{ m.form }}</td>
+                               <td>{{ m.name }}</td>
+                               <td>{{ m.strength }}</td>
+                               <td>{{ m.frequency }}</td>
+                               <td style="color:#999">{{ m.raw_line }}</td>
+                            <td>
+        <a href="{% url 'compare_medicine_prices' m.id %}">
+            Compare prices
+        </a>
+    </td>
+</tr>
+{% endfor %}
+    
+                            {% endfor %}
+                        </table>
+                    {% else %}
+                        <p><em>No medicines detected yet.</em></p>
+                    {% endif %}
+                {% endwith %}
+            </div>
+        {% endfor %}
+    {% else %}
+        <p>You haven’t uploaded any prescriptions yet.</p>
+    {% endif %}
+
+    <p><a href="{% url 'upload_prescription' %}">Upload another</a></p>
+    <p><a href="{% url 'home' %}">Back to dashboard</a></p>
+</body>
+</html>

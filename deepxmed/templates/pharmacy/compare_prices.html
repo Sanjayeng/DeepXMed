@@ -1,0 +1,49 @@
+<!-- templates/pharmacy/compare_prices.html -->
+<!doctype html>
+<html>
+<head>
+  <meta charset="utf-8">
+  <title>Best prices for: {{ medicine.name|default:medicine.raw_line }}</title>
+  <style>
+    body { font-family: system-ui, -apple-system, "Segoe UI", Roboto, "Helvetica Neue", Arial; padding: 28px; }
+    h1 { font-size: 28px; margin-bottom: 18px; }
+    .card { border:1px solid #e6e6e6; padding:12px; border-radius:8px; margin-bottom:10px; display:flex; justify-content:space-between; align-items:center;}
+    .card .meta { max-width:70%; }
+    .source { font-weight:700; margin-right:10px; }
+    .price { font-size:18px; font-weight:700; color:#0a6; }
+    a.btn { text-decoration:none; background:#4c51bf; color:white; padding:8px 12px; border-radius:6px; }
+    .note { color:#666; margin-top:14px; }
+  </style>
+</head>
+<body>
+  <h1>Best prices for: {{ medicine.name|default:medicine.raw_line }} {% if medicine.strength %} ({{ medicine.strength }}) {% endif %}</h1>
+
+  {% if offers %}
+    <div>
+      {% for o in offers %}
+        <div class="card">
+          <div class="meta">
+            <div><span class="source">{{ o.source }}</span> — <span>{{ o.title }}</span></div>
+            <div style="color:#666; font-size:13px;">{{ o.link }}</div>
+          </div>
+          <div style="text-align:right">
+            <div class="price">
+              {% if o.price %} ₹{{ o.price }} {% else %} Price N/A {% endif %}
+            </div>
+            <div style="margin-top:6px;">
+              <a class="btn" href="{{ o.link }}" target="_blank" rel="noopener">Open</a>
+            </div>
+          </div>
+        </div>
+      {% endfor %}
+    </div>
+
+    <p class="note">Results are aggregated from public site pages. Prices may change — always verify on the store page.</p>
+  {% else %}
+    <p>No online offers found yet.</p>
+    <p class="note">Try editing the medicine name to be more specific (e.g. add strength or brand).</p>
+  {% endif %}
+
+  <p><a href="{% url 'prescriptions_list' %}">← Back to prescriptions</a></p>
+</body>
+</html>

@@ -1,0 +1,397 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>DeepXMed – AI Prescription Analysis</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+
+    <style>
+        * { box-sizing: border-box; }
+        html {
+            scroll-behavior: smooth; /* smooth scroll for #about, #customers, etc. */
+        }
+        body {
+            margin: 0;
+            font-family: system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+            color: #111827;
+            background: #f9fafb;
+        }
+
+        /* ====== ANIMATIONS ====== */
+        .reveal-on-scroll {
+            opacity: 0;
+            transform: translateY(24px);
+            transition:
+                opacity 0.8s ease-out,
+                transform 0.8s ease-out;
+        }
+        .reveal-on-scroll.visible {
+            opacity: 1;
+            transform: translateY(0);
+        }
+        .delay-1 {
+            transition-delay: 0.15s;
+        }
+        .delay-2 {
+            transition-delay: 0.3s;
+        }
+        .delay-3 {
+            transition-delay: 0.45s;
+        }
+
+        /* Navbar */
+        header {
+            position: sticky;
+            top: 0;
+            z-index: 50;
+            padding: 0.9rem 3rem;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            background: rgba(255, 255, 255, 0.95);
+            backdrop-filter: blur(10px);
+            border-bottom: 1px solid #e5e7eb;
+        }
+        .logo {
+            font-weight: 800;
+            font-size: 1.3rem;
+            letter-spacing: 0.04em;
+        }
+        .logo span {
+            color: #2563eb;
+        }
+        nav a {
+            margin-left: 1.5rem;
+            text-decoration: none;
+            color: #4b5563;
+            font-size: 0.95rem;
+        }
+        nav a:hover {
+            color: #111827;
+        }
+
+        .btn {
+            display: inline-block;
+            padding: 0.6rem 1.2rem;
+            border-radius: 999px;
+            text-decoration: none;
+            font-size: 0.9rem;
+            font-weight: 500;
+        }
+        .btn-primary {
+            background: #2563eb;
+            color: #fff !important;
+        }
+        .btn-outline {
+            border: 1px solid #2563eb;
+            color: #2563eb !important;
+        }
+
+        /* Hero */
+        .hero {
+            position: relative;
+            padding: 5rem 3rem 4rem;
+            display: flex;
+            gap: 3rem;
+            max-width: 1100px;
+            margin: 0 auto;
+            align-items: center;
+        }
+        .hero::before {
+            content: "";
+            position: absolute;
+            inset: 0;
+            background-image: url("{% static 'IMAGES/hero-bg.png' %}");
+            background-size: cover;
+            background-position: center;
+            opacity: 0.25;
+            z-index: -2;
+        }
+        .hero::after {
+            content: "";
+            position: absolute;
+            inset: 0;
+            background: linear-gradient(90deg, rgba(255,255,255,0.95), rgba(255,255,255,0.85), rgba(255,255,255,0.7));
+            z-index: -1;
+        }
+        .hero-text {
+            flex: 1 1 320px;
+        }
+        .hero h1 {
+            font-size: 2.6rem;
+            margin-bottom: 1rem;
+        }
+        .hero p {
+            font-size: 1.05rem;
+            color: #4b5563;
+            margin-bottom: 1.5rem;
+        }
+        .hero-highlights {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 1rem;
+            margin-top: 1.5rem;
+            font-size: 0.9rem;
+            color: #4b5563;
+        }
+        .hero-highlight-pill {
+            padding: 0.3rem 0.9rem;
+            border-radius: 999px;
+            background: #e5f0ff;
+            border: 1px solid #bfdbfe;
+        }
+        .hero-image {
+            flex: 1 1 260px;
+            display: flex;
+            justify-content: center;
+        }
+        .hero-image-inner {
+            background: #ffffff;
+            border-radius: 1.5rem;
+            padding: 1rem;
+            box-shadow: 0 20px 35px rgba(15, 23, 42, 0.08);
+        }
+        .hero-image-inner img {
+            display: block;
+            max-width: 320px;
+            width: 100%;
+            border-radius: 1.2rem;
+        }
+
+        /* Sections */
+        section {
+            padding: 3rem 3rem;
+            max-width: 1100px;
+            margin: 0 auto;
+        }
+        h2 {
+            margin-bottom: 0.75rem;
+            font-size: 1.6rem;
+        }
+        .section-subtitle {
+            margin-bottom: 2rem;
+            color: #6b7280;
+            font-size: 0.95rem;
+        }
+
+        .grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(230px, 1fr));
+            gap: 1.5rem;
+        }
+        .card {
+            background: #ffffff;
+            border-radius: 1rem;
+            border: 1px solid #e5e7eb;
+            padding: 1rem 1rem 1.2rem;
+            box-shadow: 0 10px 18px rgba(15, 23, 42, 0.04);
+            font-size: 0.95rem;
+        }
+        .card img {
+            width: 100%;
+            height: 160px;
+            object-fit: cover;
+            border-radius: 0.8rem;
+            margin-bottom: 0.8rem;
+        }
+        .card h3 {
+            margin: 0 0 0.4rem;
+            font-size: 1.05rem;
+        }
+        .badge {
+            display: inline-block;
+            font-size: 0.7rem;
+            padding: 0.15rem 0.6rem;
+            border-radius: 999px;
+            background: #eff6ff;
+            color: #1d4ed8;
+            margin-bottom: 0.4rem;
+        }
+
+        /* Reviews */
+        .review-card {
+            position: relative;
+        }
+        .review-card::before {
+            content: "“";
+            position: absolute;
+            top: -0.8rem;
+            left: 0.4rem;
+            font-size: 3rem;
+            color: #dbeafe;
+            z-index: -1;
+        }
+        .review-author {
+            display: block;
+            margin-top: 0.7rem;
+            font-weight: 500;
+            color: #111827;
+        }
+        .review-role {
+            display: block;
+            font-size: 0.8rem;
+            color: #6b7280;
+        }
+
+        /* Footer */
+        footer {
+            padding: 1.6rem 3rem 2rem;
+            border-top: 1px solid #e5e7eb;
+            font-size: 0.85rem;
+            color: #6b7280;
+            text-align: center;
+            margin-top: 1.5rem;
+        }
+
+        @media (max-width: 768px) {
+            header { padding: 0.9rem 1.2rem; }
+            .hero { padding: 4rem 1.2rem 3rem; flex-direction: column; }
+            section { padding: 2.5rem 1.2rem; }
+            .hero h1 { font-size: 2.1rem; }
+            nav a { margin-left: 1rem; font-size: 0.85rem; }
+        }
+    </style>
+</head>
+<body>
+
+<header class="reveal-on-scroll visible"><!-- navbar visible immediately -->
+    <div class="logo">DeepX<span>Med</span></div>
+    <nav>
+        <a href="#about">About</a>
+        <a href="#customers">Customers</a>
+        <a href="#reviews">Reviews</a>
+        <a href="{% url 'login' %}">Login</a>
+        <a href="{% url 'register' %}" class="btn btn-outline">Get Started</a>
+    </nav>
+</header>
+
+<main>
+    <!-- Hero -->
+    <section class="hero">
+        <div class="hero-text reveal-on-scroll">
+            <h1>AI-powered prescription analysis for modern healthcare.</h1>
+            <p>
+                DeepXMed converts handwritten prescriptions into structured,
+                searchable data – helping clinics, pharmacies, and doctors save time
+                and reduce errors.
+            </p>
+            <div>
+                <a href="{% url 'register' %}" class="btn btn-primary">Try DeepXMed</a>
+                <a href="{% url 'login' %}" class="btn btn-outline" style="margin-left:0.7rem;">Login</a>
+            </div>
+            <div class="hero-highlights">
+                <span class="hero-highlight-pill reveal-on-scroll delay-1">⚡ Faster prescription handling</span>
+                <span class="hero-highlight-pill reveal-on-scroll delay-2">🔍 Clearer doses &amp; instructions</span>
+                <span class="hero-highlight-pill reveal-on-scroll delay-3">🔐 Secure patient dashboard</span>
+            </div>
+        </div>
+
+        <div class="hero-image">
+            <div class="hero-image-inner reveal-on-scroll delay-1">
+                <img src="{% static 'IMAGES/hero-dashboard.png' %}" alt="DeepXMed dashboard preview">
+            </div>
+        </div>
+    </section>
+
+    <!-- About -->
+    <section id="about" class="reveal-on-scroll">
+        <h2>About DeepXMed</h2>
+        <p class="section-subtitle">
+            Built by engineers and healthcare enthusiasts, DeepXMed focuses on one thing:
+            making prescriptions easy to read, manage, and act on – powered by AI.
+        </p>
+    </section>
+
+    <!-- Customers / Use Cases -->
+    <section id="customers" class="reveal-on-scroll">
+        <h2>Who uses DeepXMed?</h2>
+        <p class="section-subtitle">
+            Our tools are designed for different healthcare workflows – from large hospitals
+            to individual clinics.
+        </p>
+        <div class="grid">
+            <div class="card reveal-on-scroll delay-1">
+                <span class="badge">Hospitals &amp; Clinics</span>
+                <img src="{% static 'IMAGES/customers-clinics.png' %}" alt="Clinics and hospitals using DeepXMed">
+                <h3>Clinics &amp; Hospitals</h3>
+                <p>Centralize prescriptions, reduce manual entry, and give doctors a clean view of patient medication history.</p>
+            </div>
+            <div class="card reveal-on-scroll delay-2">
+                <span class="badge">Pharmacies</span>
+                <img src="{% static 'IMAGES/customers-pharmacies.png' %}" alt="Pharmacies using DeepXMed">
+                <h3>Pharmacies</h3>
+                <p>Quickly understand handwriting, avoid dispensing mistakes, and keep a digital record of issued medicines.</p>
+            </div>
+            <div class="card reveal-on-scroll delay-3">
+                <span class="badge">Doctors</span>
+                <img src="{% static 'IMAGES/customers-doctors.png' %}" alt="Individual doctors using DeepXMed">
+                <h3>Individual Doctors</h3>
+                <p>Stay organized with a history of prescriptions, and share clear, readable medication plans with patients.</p>
+            </div>
+        </div>
+    </section>
+
+    <!-- Reviews -->
+    <section id="reviews" class="reveal-on-scroll">
+        <h2>What our users say</h2>
+        <p class="section-subtitle">
+            Early users love the speed and clarity DeepXMed brings to prescription workflows.
+        </p>
+        <div class="grid">
+            <div class="card review-card reveal-on-scroll delay-1">
+                <img src="{% static 'IMAGES/review-hospital.png' %}" alt="Hospital team">
+                <p>"DeepXMed reduced confusion around prescriptions and made our OPD flow smoother."</p>
+                <span class="review-author">Dr. Ananya, Internal Medicine</span>
+                <span class="review-role">Multi-speciality Hospital, Bangalore</span>
+            </div>
+            <div class="card review-card reveal-on-scroll delay-2">
+                <img src="{% static 'IMAGES/review-pharmacy.png' %}" alt="Pharmacy staff">
+                <p>"Our pharmacists can verify prescription details at a glance – it's now part of our daily workflow."</p>
+                <span class="review-author">MedCare Pharmacy</span>
+                <span class="review-role">Retail Pharmacy Chain</span>
+            </div>
+            <div class="card review-card reveal-on-scroll delay-3">
+                <img src="{% static 'IMAGES/review-doctor.png' %}" alt="Doctor with patient">
+                <p>"Patients appreciate how clearly their medication plans are displayed. It builds trust."</p>
+                <span class="review-author">Dr. Rahul, General Physician</span>
+                <span class="review-role">Independent Practice</span>
+            </div>
+        </div>
+    </section>
+</main>
+
+<footer class="reveal-on-scroll">
+    © {% now "Y" %} DeepXMed. All rights reserved.
+</footer>
+
+<!-- ====== SCROLL REVEAL SCRIPT ====== -->
+<script>
+    (function () {
+        const elements = document.querySelectorAll('.reveal-on-scroll');
+
+        // If browser doesn't support IntersectionObserver, just show everything
+        if (!('IntersectionObserver' in window)) {
+            elements.forEach(el => el.classList.add('visible'));
+            return;
+        }
+
+        const observer = new IntersectionObserver((entries) => {
+            entries.forEach(entry => {
+                if (entry.isIntersecting) {
+                    entry.target.classList.add('visible');
+                    observer.unobserve(entry.target); // animate only once
+                }
+            });
+        }, {
+            threshold: 0.15
+        });
+
+        elements.forEach(el => observer.observe(el));
+    })();
+
+    
+</script>
+
+</body>
+</html>
